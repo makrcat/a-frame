@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>hey</title>
+
+    <meta name="viewport" content="width=device-width">
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/@c-frame/aframe-particle-system-component@1.2.x/dist/aframe-particle-system-component.min.js"></script>
+
+
+</head>
+
+<body>
+
+    <a-scene light="defaultLightsEnabled: false">
+
+        <!-- plane -->
+        <a-plane rotation="-90 0 0" width="50" height="50" color="#7BC8A4"></a-plane>
+
+        <!-- sky -->
+        <a-sky color="#000000"></a-sky>
+
+        <!-- light -->
+        <a-entity light="type: ambient; color: #FFFFFF; intensity: 1"></a-entity>
+        <a-sphere position="0 75 -5" radius="2" material="color: white; emissive: white; emissiveIntensity: 2">
+        </a-sphere>
+
+        <!--<a-entity particle-system="preset: snow" position="0 0 -10"></a-entity>-->
+        <a-entity position="0 2 -10"
+            particle-system="preset: none; color: #FF0040, #FFD700, #00FFFF, #00FFFF;
+                             particleCount: 200;
+                             size: 1;
+                             sizeSpread: 2;
+                             velocitySpread: 5 5 5;
+                             duration: 0.5;
+                             maxAge: 3;
+                             opacity: 1;
+                             enabled: true;">
+  </a-entity>
+
+        <!-- wall -->
+
+        <a-box color="tomato" position="0 0 -8" depth="2" height="5" width="8"></a-box>
+
+    </a-scene>
+
+
+</body>
+
+</html>
