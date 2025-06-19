@@ -1,85 +1,183 @@
 //@ts-check
 
-//@ts-ignore it's gonna complain about aframe but yeah
+//@ts-ignore
 const THREE = AFRAME.THREE;
 
-//@ts-ignore
+class Firework {
+    constructor(position) {
+        this.position = position.clone();
+        this.LL = 2;
+        this.PTL = 3;
+        this.elapsedTime = 0;
+        this.state = "launch";
+        this.particles = [];
+        this.first = null;
+    }
+
+    setupParticles(THREEscene) {
+        const particleCount = 100;
+
+        let a = new ParticleObj(20, Math.PI, 0, this.PTL, this.position);
+        a.scale(6);
+        a.setup(THREEscene);
+        this.first = a;
+
+        for (let i = 0; i < particleCount; i++) {
+
+            const speed = Math.random() * 2 + 15;
+            const theta = Math.random() * 2 * Math.PI;
+            const phi = Math.random() * (Math.PI / 4);
+
+            let aaa = new ParticleObj(speed, theta, phi, this.PTL, this.position);
+            aaa.setup(THREEscene);
+
+            this.particles.push(aaa);
+
+        }
+    }
+
+    update(deltaSeconds) {
+        if (this.state === "launch") {
+
+            //@ts-ignore
+            this.first.update(deltaSeconds);
+
+            this.elapsedTime += deltaSeconds;
+
+            if (this.elapsedTime >= this.LL) {
+                this.state = "explode";
+
+                for (const p of this.particles) {
+                    //@ts-ignore
+                    p.updatePosition(this.first?.glow.position);
+                }
+            }
+
+        } else if (this.state === "explode") {
+            for (const p of this.particles) {
+                p.update(deltaSeconds);
+            }
+        }
+    }
+
+}
+
+class ParticleObj {
+    constructor(speed, theta, phi, lifetime, position) {
+
+        this.speed = speed;
+        this.theta = theta;
+        this.phi = phi;
+        this.lifetime = lifetime;
+        this.particleLifetime = lifetime;
+        this.position = position.clone();
+
+        this.velocity = new THREE.Vector3(
+            speed * Math.sin(phi) * Math.cos(theta),
+            speed * Math.cos(phi) + 10,
+            speed * Math.sin(phi) * Math.sin(theta)
+        );
+
+        this.glow = new GlowParticle('soft-circle.png', [1, 0.1, 0]);
+        this.core = new GlowParticle('core-circle.png', [1, 0.1, 0]);
+        this.glow.setPosition(this.position);
+        this.core.setPosition(this.position);
+        // 
+    }
+
+    setup(THREEscene) {
+        this.glow.addTo(THREEscene);
+        this.core.addTo(THREEscene);
+
+    }
+
+    updatePosition(pos) {
+        this.position = pos.clone();
+        this.glow.setPosition(this.position);
+        this.core.setPosition(this.position);
+    }
+
+    update(deltaSeconds) {
+
+        this.velocity.y -= 9.8 * deltaSeconds;
+
+        this.position.addScaledVector(this.velocity, deltaSeconds);
+        this.glow.setPosition(this.position);
+        this.core.setPosition(this.position);
+
+        this.fadehelper(deltaSeconds);
+
+        this.lifetime -= deltaSeconds;
+    }
+
+    fadehelper(deltaSeconds) {
+        const t = 1 - (this.lifetime / this.particleLifetime);
+        const opacity = 1 - t;
+        const scale = (1 - t) * 1.5;
+
+        this.glow.setOpacity(opacity * 0.5);
+        this.glow.setScale(scale);
+
+        this.core.setOpacity(opacity * 0.6);
+        this.core.setScale(scale * 0.4);
+    }
+
+    scale(n) {
+        this.glow.setScale(n);
+        this.core.setScale(n);
+    }
+}
+
+// glasses
+class GlowParticle {
+    constructor(textureUrl, color, size = 1) {
+        const map = new THREE.TextureLoader().load(textureUrl);
+        const material = new THREE.SpriteMaterial({
+            map,
+            color: new THREE.Color(...color),
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+        this.sprite = new THREE.Sprite(material);
+        this.sprite.scale.set(size, size, size);
+    }
+
+    addTo(scene) {
+        scene.add(this.sprite);
+    }
+
+    setPosition(pos) {
+        this.sprite.position.copy(pos);
+    }
+
+    setOpacity(alpha) {
+        this.sprite.material.opacity = alpha;
+    }
+
+    setScale(scale) {
+        this.sprite.scale.set(scale, scale, scale);
+    }
+
+    get position() {
+        return this.sprite.position;
+    }
+}
+
+// A-FRAME
+// @ts-ignore typescript pllease stop
 AFRAME.registerComponent('particle-animation', {
     schema: {},
 
     init: function () {
-        const particleCount = 200;
-        const LFTIME = 300;
-
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
-        const velocities = [];
-        const lifetimes = new Array(particleCount).fill(LFTIME);
-
-        for (let i = 0; i < particleCount; i++) {
-            positions[i * 3] = 0;
-            positions[i * 3 + 1] = 0;
-            positions[i * 3 + 2] = 0;
-
-            const speed = Math.random() * 1.5 + 5.0;
-            const theta = Math.random() * 2 * Math.PI;
-
-            // const speed = Math.random() * 4 + 2;
-            // speed from 2 to 6, bigger
-            const phi = Math.random() * (Math.PI / 4);
-            // narrower vertical spread (0 to 45°) for more upward shots
-
-            const vx = speed * Math.sin(phi) * Math.cos(theta);
-            const vy = speed * Math.cos(phi) + 10;
-            const vz = speed * Math.sin(phi) * Math.sin(theta);
-
-            velocities.push(new THREE.Vector3(vx, vy, vz));
-        }
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-        const material = new THREE.PointsMaterial({
-            size: 0.2,
-            vertexColors: true,
-        });
-
-        const particles = new THREE.Points(geometry, material);
-        this.el.object3D.add(particles);
-
-        this.particles = particles;
-        this.velocities = velocities;
-        this.lifetimes = lifetimes;
-        this.LFTIME = LFTIME;
+        this.firework = new Firework(new THREE.Vector3(0, 2, -3));
+        this.firework.setupParticles(this.el.sceneEl.object3D);
     },
 
     tick: function (time, delta) {
         const deltaSeconds = delta / 1000;
-
-        const positions = this.particles.geometry.attributes.position.array;
-        const colors = this.particles.geometry.attributes.color.array;
-
-        for (let i = 0; i < this.lifetimes.length; i++) {
-            if (this.lifetimes[i] > 0) {
-                positions[i * 3] += this.velocities[i].x * deltaSeconds;
-                positions[i * 3 + 1] += this.velocities[i].y * deltaSeconds;
-                positions[i * 3 + 2] += this.velocities[i].z * deltaSeconds;
-
-                this.velocities[i].y += -9.8 * deltaSeconds; // gravity m/s²
-
-                this.lifetimes[i]--;
-
-                const t = 1 - this.lifetimes[i] / this.LFTIME;
-
-                colors[i * 3] = (1 - t) * 1.0;
-                colors[i * 3 + 1] = (1 - t) * 0.1;
-                colors[i * 3 + 2] = 0;
-            }
-        }
-
-        this.particles.geometry.attributes.position.needsUpdate = true;
-        this.particles.geometry.attributes.color.needsUpdate = true;
+        this.firework.update(deltaSeconds);
     }
+
 
 });
