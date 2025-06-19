@@ -3,33 +3,40 @@
 //@ts-ignore
 const THREE = AFRAME.THREE;
 
+
+
 class Firework {
-    constructor(position) {
+    constructor(position, LL = 2.5, PTL = 3, color=[1, 0.1, 0], tail=15, launchVI = 35, burstVI = 20, BRI = 1) {
         this.position = position.clone();
-        this.LL = 2;
+        this.LL = 2.5;
         this.PTL = 3;
         this.elapsedTime = 0;
         this.state = "launch";
         this.particles = [];
         this.first = null;
+        this.color = color;
+        this.tail = tail;
+        this.launchVI = launchVI;
+        this.burstVI = burstVI;
+        this.burstRandVI = BRI;
     }
 
     setupParticles(THREEscene) {
-        const particleCount = 100;
+        const particleCount = 300;
 
-        let a = new ParticleObj(20, Math.PI, 0, this.PTL, this.position);
-        a.scale(6);
-        a.setup(THREEscene);
+        let a = new ParticleObj(THREEscene, this.launchVI, Math.PI, 0, this.PTL, this.position, this.color, this.tail);
+        a.scale(3);
+        a.setup();
         this.first = a;
 
         for (let i = 0; i < particleCount; i++) {
 
-            const speed = Math.random() * 2 + 15;
-            const theta = Math.random() * 2 * Math.PI;
-            const phi = Math.random() * (Math.PI / 4);
+            const speed = Math.random() * this.burstRandVI + this.burstVI;
+            const theta = Math.random() * 2 * Math.PI
+            const phi = Math.random() * (Math.PI);
 
-            let aaa = new ParticleObj(speed, theta, phi, this.PTL, this.position);
-            aaa.setup(THREEscene);
+            let aaa = new ParticleObj(THREEscene, speed, theta, phi, this.PTL, this.position, this.color, this.tail);
+            aaa.setup();
 
             this.particles.push(aaa);
 
@@ -46,6 +53,12 @@ class Firework {
 
             if (this.elapsedTime >= this.LL) {
                 this.state = "explode";
+                this.first?.setOpacity(0);
+
+                //@ts-ignore
+                for (const p of this.first?.trailSprites) {
+                    p.material.opacity = 0;
+                }
 
                 for (const p of this.particles) {
                     //@ts-ignore
@@ -62,9 +75,16 @@ class Firework {
 
 }
 
-class ParticleObj {
-    constructor(speed, theta, phi, lifetime, position) {
+class Peony extends Firework {
+    constructor(position, VI= 25) {
+        super(position, 2.5, 3, [1, 0.2, 0.8], 5, 40, VI, 1);
+    }
+}
 
+class ParticleObj {
+    constructor(scene, speed, theta, phi, lifetime, position, color=[1, 0.1, 0], tail=20) {
+
+        this.scene = scene;
         this.speed = speed;
         this.theta = theta;
         this.phi = phi;
@@ -72,23 +92,32 @@ class ParticleObj {
         this.particleLifetime = lifetime;
         this.position = position.clone();
 
+        this.trailPoints = [];
+        this.trailSprites = [];
+        this.color = color;
+        this.tailLength = tail;
+
+
         this.velocity = new THREE.Vector3(
             speed * Math.sin(phi) * Math.cos(theta),
             speed * Math.cos(phi) + 10,
             speed * Math.sin(phi) * Math.sin(theta)
         );
 
-        this.glow = new GlowParticle('soft-circle.png', [1, 0.1, 0]);
-        this.core = new GlowParticle('core-circle.png', [1, 0.1, 0]);
+        this.glow = new GlowParticle('soft-circle.png', color); // [1, 0.1, 0]
+        this.core = new GlowParticle('core-circle.png', color);
         this.glow.setPosition(this.position);
         this.core.setPosition(this.position);
+
+        this.glow.setOpacity(0);
+        this.core.setOpacity(0);
+
         // 
     }
 
-    setup(THREEscene) {
-        this.glow.addTo(THREEscene);
-        this.core.addTo(THREEscene);
-
+    setup() {
+        this.glow.addTo(this.scene);
+        this.core.addTo(this.scene);
     }
 
     updatePosition(pos) {
@@ -100,31 +129,97 @@ class ParticleObj {
     update(deltaSeconds) {
 
         this.velocity.y -= 9.8 * deltaSeconds;
-
         this.position.addScaledVector(this.velocity, deltaSeconds);
+
+        //
+        this.trailPoints.push(this.position.clone());
+
+        if (this.trailPoints.length > this.tailLength) {
+            this.trailPoints.shift();
+        }
+
+        for (let i = 0; i < this.trailPoints.length; i++) {
+            let sprite = this.trailSprites[i];
+
+            if (!sprite) {
+                const material = new THREE.SpriteMaterial({
+                    map: new THREE.TextureLoader().load('soft-circle.png'),
+                    color: this.color,
+                    transparent: true,
+                    /*
+                    blending: THREE.AdditiveBlending,
+                    */
+                   blending: THREE.NormalBlending,
+                    depthWrite: false
+                });
+                sprite = new THREE.Sprite(material);
+                this.scene.add(sprite);
+                this.trailSprites[i] = sprite;
+            }
+
+            sprite.position.copy(this.trailPoints[i]);
+        }
+        ///
+
         this.glow.setPosition(this.position);
         this.core.setPosition(this.position);
 
         this.fadehelper(deltaSeconds);
 
+        //
+
         this.lifetime -= deltaSeconds;
+
     }
 
     fadehelper(deltaSeconds) {
         const t = 1 - (this.lifetime / this.particleLifetime);
-        const opacity = 1 - t;
-        const scale = (1 - t) * 1.5;
+        const baseOpacity = 1 - t;
+        const flickerFactor = t > 0.4 ? (Math.random() * 0.6 + 0.4) : (Math.random() * 0.3 + 0.7);
 
-        this.glow.setOpacity(opacity * 0.5);
-        this.glow.setScale(scale);
+        const opacity = baseOpacity * flickerFactor;
 
-        this.core.setOpacity(opacity * 0.6);
-        this.core.setScale(scale * 0.4);
+        const eased = t * t;
+        const scale = (1 - eased) * flickerFactor;
+
+        this.glow.setOpacity(opacity);
+        //this.glow.setScale(scale);
+
+        this.core.setOpacity(opacity);
+        this.core.setScale(scale);
+
+
+        ////
+
+        if (this.trailSprites) {
+            const len = this.trailSprites.length;
+            for (let i = 0; i < this.trailSprites.length; i++) {
+                const n = 1 - i / len;
+
+                this.trailSprites[len - 1 - i].material.opacity = opacity * n;
+
+                const baseScale = 0.6
+                this.trailSprites[len - 1 - i].scale.set(baseScale * n, baseScale * n, 1);
+            }
+        }
+
+        while (this.trailSprites.length > this.trailPoints.length) {
+            let sprite = this.trailSprites.pop();
+            this.scene.remove(sprite);
+            sprite.material.map.dispose();
+            sprite.material.dispose();
+        }
+
     }
 
     scale(n) {
         this.glow.setScale(n);
         this.core.setScale(n);
+    }
+
+    setOpacity(n) {
+        this.glow.setOpacity(n);
+        this.core.setOpacity(n);
     }
 }
 
@@ -170,7 +265,8 @@ AFRAME.registerComponent('particle-animation', {
     schema: {},
 
     init: function () {
-        this.firework = new Firework(new THREE.Vector3(0, 2, -3));
+        this.firework = new Peony(new THREE.Vector3(0, 2, 0), 20);
+
         this.firework.setupParticles(this.el.sceneEl.object3D);
     },
 
