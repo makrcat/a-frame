@@ -11,6 +11,7 @@
         src="https://unpkg.com/@c-frame/aframe-particle-system-component@1.2.x/dist/aframe-particle-system-component.min.js"></script>
 
 
+
     <style>
         body {
             margin: 0;
@@ -23,18 +24,27 @@
 </head>
 
 <body>
-    <a-scene light="defaultLightsEnabled: false">
+    <a-scene light="defaultLightsEnabled: false" shadow="enabled: true; type: pcfs" spawn-houses>
 
         <!-- plane -->
-        <a-plane rotation="-90 0 0" width="50" height="50" color="#7BC8A4"></a-plane>
+        <a-plane rotation="-90 0 0" width="200" height="200" color="#7BC8A4"></a-plane>
 
         <!-- sky -->
-        <a-sky color="#000000"></a-sky>
+         
+        <a-sky color="#0c1445"></a-sky>
+    
 
         <!--cam-->
-        <a-camera position="0 1 20"></a-camera>
+        <a-camera position="0 50 20"></a-camera>
 
         <!-- light -->
+
+        <a-light type="directional" intensity="1" position="2 4 4" cast-shadow="true" shadow-map-width="1024"
+            shadow-map-height="1024" shadow-camera-near="0.5" shadow-camera-far="20" shadow-camera-left="-5"
+            shadow-camera-right="5" shadow-camera-top="5" shadow-camera-bottom="-5">
+        </a-light>
+
+
         <a-entity light="type: ambient; color: #FFFFFF; intensity: 1"></a-entity>
         <a-sphere position="0 400 -5" radius="10" material="color: white; emissive: white; emissiveIntensity: 2">
         </a-sphere>
@@ -42,12 +52,29 @@
         <a-entity particle-animation position="0 0 0"></a-entity>
         <!-- wall -->
 
-        <a-box position="0 1 0" width="2" height="1" depth="2" src="#wall-texture"></a-box>
-        <a-entity position="0 1.5 0" scale="1.2" material="src: #roof-texture; side: double" geometry=" primitive: custom-geometry"></a-entity>
+        <a-box position="-1 0.5 0" width="2" height="1" depth="2" src="#wall-texture"></a-box>
+
+        <!--road-->
+        <a-box position="0 0 10" width="80" height="2.5" depth="1.5" 
+        material="repeat: 20 1;" src="#sidewalk-texture"></a-box>
+
+        <a-box position="0 -1 15" width="80" height="3" depth="10" 
+        material="repeat: 10 1;" src="#road-texture"></a-box>
+
+
+        <a-entity position="-1 1 0" scale="1.2" material="src: #roof-texture; side: double; roughness: 1"
+            geometry=" primitive: custom-geometry"></a-entity>
+
+        <a-entity id="house-container" position="-10 0 0"></a-entity>
+
 
         <a-assets>
             <img id="wall-texture" src="roof.png" />
             <img id="roof-texture" src="roof.png" />
+            <img id="sidewalk-texture" src="sidewalk.png" />
+            <img id="road-texture" src="asphalt.jpg" />
+            <a-asset-item id="house" src="models/house.glb"></a-asset-item>
+
         </a-assets>
 
     </a-scene>
@@ -56,6 +83,26 @@
 
 
     <script src="script.js"></script>
+    <script>
+        AFRAME.registerComponent('spawn-houses', {
+            init: function () {
+                const container = document.querySelector('#house-container');
+
+                const count = 4; // number of houses
+                const spacing = 20; // spacing between houses
+
+                for (let i = 0; i < count; i++) {
+                    const house = document.createElement('a-entity');
+                    house.setAttribute('gltf-model', '#house');
+                    house.setAttribute('scale', '0.7 0.7 0.7');
+                    house.setAttribute('material', 'color: #8B0000');
+                    house.setAttribute('position', `${i * spacing} 0 0`);
+                    house.setAttribute('rotation', '0 90 0');
+                    container.appendChild(house);  // append to container
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

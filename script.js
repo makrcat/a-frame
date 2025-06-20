@@ -77,7 +77,7 @@ class Firework {
 
 class Peony extends Firework {
     constructor(position, VI = 25) {
-        super(position, 2.5, 3, [1, 0.2, 0.8], 5, 40, VI, 1);
+        super(position, 2.5, 2, [1, 0.2, 0.8], 5, 40, VI, 1);
     }
 }
 
@@ -283,39 +283,48 @@ AFRAME.registerComponent('particle-animation', {
 
 // @ts-ignore
 AFRAME.registerGeometry('custom-geometry', {
-    init: function () {
-        const geometry = new THREE.BufferGeometry();
+  init: function () {
+    const geometry = new THREE.BufferGeometry();
 
-        const vertices = new Float32Array([
-            -1, 0, 1,
-            1, 0, 1,
-            1, 0, -1,
-            -1, 0, -1,
-            0, 1, 0
-        ]);
+    const vertices = new Float32Array([
+      -1, 0,  1,
+       1, 0,  1,
+       1, 0, -1,
+      -1, 0, -1,
+       0, 1,  0
+    ]);
 
-        const indices = [
-            0, 1, 4,  // front face
-            1, 2, 4,  // right face
-            2, 3, 4,  // back face
-            3, 0, 4,  // left face
-            0, 3, 2,  // bottom face triangle 1
-            0, 2, 1   // bottom face triangle 2
-        ];
+    const indices = [
+      0, 1, 4,  // front face
+      1, 2, 4,  // right face
+      2, 3, 4,  // back face
+      3, 0, 4,  // left face
+      0, 3, 2,  // bottom face triangle 1
+      0, 2, 1   // bottom face triangle 2
+    ];
 
-        const uvs = new Float32Array([
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-            0.5, 1
-        ]);
+    const uvs = new Float32Array([
+      0, 0,
+      1, 0,
+      1, 1,
+      0, 1,
+      0.5, 1
+    ]);
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-        geometry.setIndex(indices);
-        geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-        geometry.computeVertexNormals();
+    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+    geometry.computeVertexNormals();
 
-        this.geometry = geometry;
-    }
+    this.geometry = geometry;
+
+    // Set attributes and indices
+    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+
+    // Calculate normals for lighting
+    geometry.computeVertexNormals();
+
+    this.geometry = geometry;
+  }
 });
