@@ -32,7 +32,7 @@
         <a-sky color="#000000"></a-sky>
 
         <!--cam-->
-        <a-camera position="0 100 100"></a-camera>
+        <a-camera position="0 1 20"></a-camera>
 
         <!-- light -->
         <a-entity light="type: ambient; color: #FFFFFF; intensity: 1"></a-entity>
@@ -40,10 +40,15 @@
         </a-sphere>
 
         <a-entity particle-animation position="0 0 0"></a-entity>
-        <a-scene bloom></a-scene>
         <!-- wall -->
 
-        <a-box color="tomato" position="0 2 0" depth="2" height="5" width="8"></a-box>
+        <a-box position="0 1 0" width="2" height="1" depth="2" src="#wall-texture"></a-box>
+        <a-entity position="0 1.5 0" scale="1.2" material="src: #roof-texture; side: double" geometry=" primitive: custom-geometry"></a-entity>
+
+        <a-assets>
+            <img id="wall-texture" src="roof.png" />
+            <img id="roof-texture" src="roof.png" />
+        </a-assets>
 
     </a-scene>
 
