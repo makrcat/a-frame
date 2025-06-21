@@ -6,10 +6,11 @@
     <title>Three.js Basics</title>
     <meta name="viewport" content="width=device-width">
     <link href="style.css" rel="stylesheet" type="text/css" />
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script
         src="https://unpkg.com/@c-frame/aframe-particle-system-component@1.2.x/dist/aframe-particle-system-component.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@1.0.1/dist/aframe-physics-system.min.js"></script>
+
+
 
     <style>
         body {
@@ -23,11 +24,10 @@
 </head>
 
 <body>
-    <a-scene physics="debug: true; gravity: -9.8" light="defaultLightsEnabled: false" shadow="enabled: true; type: pcfs" spawn-houses
-        >
+    <a-scene light="defaultLightsEnabled: false" shadow="enabled: true; type: pcfs" spawn-houses>
 
         <!-- plane -->
-        <a-plane static-body rotation="-90 0 0" width="200" height="200" color="#7BC8A4"></a-plane>
+        <a-plane rotation="-90 0 0" width="200" height="200" color="#7BC8A4"></a-plane>
 
         <!-- sky -->
 
@@ -35,10 +35,7 @@
 
 
         <!--cam-->
-        <a-entity id="rig" position="0 1.6 20" dynamic-body="mass: 1; shape: sphere; sphereRadius: 0.5" player-controls>
-            <a-camera id="cam" look-controls></a-camera>
-        </a-entity>
-
+        <a-camera position="0 5 45" look-controls="pointerLockEnabled: true"></a-camera>
 
         <!-- light -->
 
@@ -55,20 +52,21 @@
         <a-entity particle-animation position="0 0 0"></a-entity>
         <!-- wall -->
 
-        <a-box static-body position="-1 0.5 0" width="2" height="1" depth="2" src="#wall-texture"></a-box>
+        <a-box position="-1 0.5 0" width="2" height="1" depth="2" src="#wall-texture"></a-box>
 
         <!--road-->
-        <a-box static-body position="0 0 10" width="80" height="1.5" depth="1.5" material="repeat: 20 1;"
+        <a-box position="0 0 10" width="80" height="1.5" depth="1.5" material="repeat: 20 1;"
             src="#sidewalk-texture"></a-box>
 
-        <a-box static-body position="0 -1 15" width="80" height="3" depth="10" material="repeat: 10 1;"
-            src="#road-texture"></a-box>
+        <a-box position="0 -1 15" width="80" height="3" depth="10" material="repeat: 10 1;" src="#road-texture"></a-box>
 
 
         <a-entity position="-1 1 0" scale="1.2" material="src: #roof-texture; side: double; roughness: 1"
             geometry=" primitive: custom-geometry"></a-entity>
 
-        <a-entity static-body id="house-container" position="-10 0 0"></a-entity>
+        <a-entity id="house-container" position="-10 0 0"></a-entity>
+
+        <a-entity gltf-model="#playstructure" position="0 0 50"></a-entity>
 
 
         <a-assets>
@@ -77,10 +75,10 @@
             <img id="sidewalk-texture" src="sidewalk.png" />
             <img id="road-texture" src="asphalt.jpg" />
             <a-asset-item id="house" src="models/house.glb"></a-asset-item>
+            <a-asset-item id="playstructure" src="models/houseee.glb"></a-asset-item>
+
 
         </a-assets>
-
-
 
     </a-scene>
 
@@ -107,8 +105,7 @@
                 }
             }
         });
-        </script>
-    
+    </script>
 </body>
 
 </html>

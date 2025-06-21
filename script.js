@@ -6,25 +6,26 @@ const THREE = AFRAME.THREE;
 
 
 class Firework {
-    constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], tail = 15, launchVI = 35, burstVI = 20, BRI = 1) {
+    constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], tail = 15, launchVI = 35, burstVI = 20, particles = 100, BRI = 1) {
         this.position = position.clone();
-        this.LL = 2.5;
-        this.PTL = 3;
+        this.LL = LL;
+        this.PTL = PTL;
         this.elapsedTime = 0;
         this.state = "launch";
         this.particles = [];
         this.first = null;
-        this.color = color;
+        this.color =new THREE.Color(...color),
         this.tail = tail;
         this.launchVI = launchVI;
         this.burstVI = burstVI;
         this.burstRandVI = BRI;
+        this.particleCount = particles
     }
 
     setupParticles(THREEscene) {
-        const particleCount = 300;
+        const particleCount = this.particleCount;
 
-        let a = new ParticleObj(THREEscene, this.launchVI, Math.PI, 0, this.PTL, this.position, this.color, this.tail);
+        let a = new ParticleObj(THREEscene, this.launchVI, Math.PI, 0, this.LL, this.position, this.color, this.tail);
         a.scale(3);
         a.setup();
         this.first = a;
@@ -76,10 +77,32 @@ class Firework {
 }
 
 class Peony extends Firework {
-    constructor(position, VI = 25) {
-        super(position, 2.5, 2, [1, 0.2, 0.8], 5, 40, VI, 1);
+    constructor(position, color = [1, 0.2, 0.8], VI = 20) {
+        super(position, 1.5, 1, color, 5, 60, VI, 200, 1);
+        // launch vi then burst vi
     }
 }
+
+class Willow extends Firework {
+    constructor(position, color = [1, 0.2, 0.8] , VI = 10) {
+        super(position, 2, 2.5, color, 200, 60, VI, 40, 8);
+    }
+}
+
+class Chrysanthemum extends Firework {
+    constructor(position, color = [1, 0.2, 0.8], VI = 25) {
+        super(position, 2, 1.7, color, 25, 60, VI, 200, 1);
+        // launch vi then burst vi
+    }
+}
+
+class Spider extends Firework {
+    constructor(position, color = [1, 0.2, 0.8], VI = 30) {
+        super(position, 0.5, 0.7, color, 100, 170, VI, 100, 40);
+        // launch vi then burst vi
+    }
+}
+
 
 class ParticleObj {
     constructor(scene, speed, theta, phi, lifetime, position, color = [1, 0.1, 0], tail = 20) {
@@ -90,6 +113,7 @@ class ParticleObj {
         this.phi = phi;
         this.lifetime = lifetime;
         this.particleLifetime = lifetime;
+
         this.position = position.clone();
 
         this.trailPoints = [];
@@ -128,7 +152,7 @@ class ParticleObj {
 
     update(deltaSeconds) {
 
-        this.velocity.y -= 9.8 * deltaSeconds;
+        this.velocity.y += -18.8 * deltaSeconds;
         this.position.addScaledVector(this.velocity, deltaSeconds);
 
         //
@@ -146,10 +170,10 @@ class ParticleObj {
                     map: new THREE.TextureLoader().load('soft-circle.png'),
                     color: this.color,
                     transparent: true,
-                    /*
+                    
                     blending: THREE.AdditiveBlending,
-                    */
-                    blending: THREE.NormalBlending,
+                    
+                    // blending: THREE.NormalBlending,
                     depthWrite: false
                 });
                 sprite = new THREE.Sprite(material);
@@ -174,7 +198,7 @@ class ParticleObj {
 
     fadehelper(deltaSeconds) {
         const t = 1 - (this.lifetime / this.particleLifetime);
-        const baseOpacity = 1 - t;
+        const baseOpacity = (1 - t);
         const flickerFactor = t > 0.4 ? (Math.random() * 0.6 + 0.4) : (Math.random() * 0.3 + 0.7);
 
         const opacity = baseOpacity * flickerFactor;
@@ -196,9 +220,10 @@ class ParticleObj {
             for (let i = 0; i < this.trailSprites.length; i++) {
                 const n = 1 - i / len;
 
-                this.trailSprites[len - 1 - i].material.opacity = opacity * n;
+                this.trailSprites[len - 1 - i].material.opacity = 
+                Math.max(0, (baseOpacity - 0.3) * n);
 
-                const baseScale = 0.6
+                const baseScale = 0.6;
                 this.trailSprites[len - 1 - i].scale.set(baseScale * n, baseScale * n, 1);
             }
         }
@@ -259,72 +284,114 @@ class GlowParticle {
     }
 }
 
+function brightcolor() {
+    const c = [Math.random(), Math.random(), Math.random()];
+    const max = Math.max(...c);
+    return c.map(v => v / max);
+}
+
+
 // A-FRAME
 // @ts-ignore typescript pllease stop
 AFRAME.registerComponent('particle-animation', {
-    schema: {},
+    schema: {
+        count: { type: 'int', default: 5 },
+        staggerTime: { type: 'number', default: 5000 }
+    },
 
     init: function () {
-        this.firework = new Peony(new THREE.Vector3(0, 2, 0), 20);
+        this.fireworks = [];
+        this.startTimes = [];
 
-        this.firework.setupParticles(this.el.sceneEl.object3D);
+        const basePosition = new THREE.Vector3(100, 0, 0);
+
+        for (let i = 0; i < this.data.count; i++) {
+            const position = new THREE.Vector3(
+                basePosition.x + (Math.random()) * 50,
+                basePosition.y,
+                basePosition.z + (Math.random()) * 100,
+            );
+            const color = brightcolor();
+
+           // const firework = new Willow(position, color);
+            // const firework = new Chrysanthemum(position, color);
+            const firework = new Spider(position, color);
+
+
+            firework.setupParticles(this.el.sceneEl.object3D);
+            this.fireworks.push(firework);
+
+            // Record when each firework is allowed to start (staggered)
+            this.startTimes.push(i * this.data.staggerTime);
+        }
+
+        this.elapsed = 0;
     },
 
     tick: function (time, delta) {
-        const deltaSeconds = delta / 1000;
-        this.firework.update(deltaSeconds);
+        const deltaSeconds = delta / 2000;
+        this.elapsed += delta;
+
+        // Update fireworks in reverse order so we can safely remove finished ones
+        for (let i = this.fireworks.length - 1; i >= 0; i--) {
+            if (this.elapsed >= this.startTimes[i]) {
+                const done = this.fireworks[i].update(deltaSeconds);
+                if (done) {
+                    // If firework signals it's done, remove it and its startTime
+                    this.fireworks.splice(i, 1);
+                    this.startTimes.splice(i, 1);
+                }
+            }
+        }
     }
-
-
 });
-
 
 
 
 // @ts-ignore
 AFRAME.registerGeometry('custom-geometry', {
-  init: function () {
-    const geometry = new THREE.BufferGeometry();
+    init: function () {
+        const geometry = new THREE.BufferGeometry();
 
-    const vertices = new Float32Array([
-      -1, 0,  1,
-       1, 0,  1,
-       1, 0, -1,
-      -1, 0, -1,
-       0, 1,  0
-    ]);
+        const vertices = new Float32Array([
+            -1, 0, 1,
+            1, 0, 1,
+            1, 0, -1,
+            -1, 0, -1,
+            0, 1, 0
+        ]);
 
-    const indices = [
-      0, 1, 4,  // front face
-      1, 2, 4,  // right face
-      2, 3, 4,  // back face
-      3, 0, 4,  // left face
-      0, 3, 2,  // bottom face triangle 1
-      0, 2, 1   // bottom face triangle 2
-    ];
+        const indices = [
+            0, 1, 4,  // front face
+            1, 2, 4,  // right face
+            2, 3, 4,  // back face
+            3, 0, 4,  // left face
+            0, 3, 2,  // bottom face triangle 1
+            0, 2, 1   // bottom face triangle 2
+        ];
 
-    const uvs = new Float32Array([
-      0, 0,
-      1, 0,
-      1, 1,
-      0, 1,
-      0.5, 1
-    ]);
+        const uvs = new Float32Array([
+            0, 0,
+            1, 0,
+            1, 1,
+            0, 1,
+            0.5, 1
+        ]);
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    geometry.setIndex(indices);
-    geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-    geometry.computeVertexNormals();
+        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+        geometry.setIndex(indices);
+        geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+        geometry.computeVertexNormals();
 
-    this.geometry = geometry;
+        this.geometry = geometry;
 
-    // Set attributes and indices
-    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    geometry.setIndex(indices);
+        // Set attributes and indices
+        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+        geometry.setIndex(indices);
 
-    // Calculate normals for lighting
-    geometry.computeVertexNormals();
+        // Calculate normals for lighting
+        geometry.computeVertexNormals();
 
-    this.geometry = geometry;
-  }
+        this.geometry = geometry;
+    }
 });
