@@ -85,13 +85,13 @@ class Peony extends Firework {
 
 class Willow extends Firework {
     constructor(position, color = [1, 0.2, 0.8] , VI = 10) {
-        super(position, 2, 1.5, color, 200, 60, VI, 40, 8);
+        super(position, 2, 2.5, color, 200, 60, VI, 40, 8);
     }
 }
 
 class Chrysanthemum extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 20) {
-        super(position, 2, 1.3, color, 25, 60, VI, 200, 1);
+        super(position, 2, 0.5, color, 25, 60, VI, 200, 1);
         // launch vi then burst vi
     }
 }
@@ -330,7 +330,7 @@ AFRAME.registerComponent('particle-animation', {
     },
 
     tick: function (time, delta) {
-        const deltaSeconds = delta / 2000;
+        const deltaSeconds = delta / 1000;
         this.elapsed += delta;
 
         // Update fireworks in reverse order so we can safely remove finished ones
