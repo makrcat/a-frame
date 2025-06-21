@@ -91,14 +91,14 @@ class Willow extends Firework {
 
 class Chrysanthemum extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 20) {
-        super(position, 2, 0.5, color, 25, 60, VI, 200, 1);
+        super(position, 2, 1.5, color, 25, 60, VI, 200, 1);
         // launch vi then burst vi
     }
 }
 
 class Spider extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 70) {
-        super(position, 0.5, 0.3, color, 100, 170, VI, 60, 30);
+        super(position, 0.5, 1, color, 100, 170, VI, 60, 30);
         // launch vi then burst vi
     }
 }
@@ -188,21 +188,17 @@ class ParticleObj {
         this.glow.setPosition(this.position);
         this.core.setPosition(this.position);
 
-        this.fadehelper(deltaSeconds);
-
-        //
-
+        this.fadehelper();
         this.lifetime -= deltaSeconds;
 
     }
 
-    fadehelper(deltaSeconds) {
+    fadehelper() {
         const t = 1 - (this.lifetime / this.particleLifetime);
-        //const baseOpacity = (1 - t);
-        const baseOpacity = 1 - Math.pow(1 - t, 2); // ok so when it is 1.5 it breaks idk
+        const baseOpacity = (1 - t);
         const flickerFactor = t > 0.4 ? (Math.random() * 0.6 + 0.4) : (Math.random() * 0.3 + 0.7);
         const opacity = baseOpacity * flickerFactor;
-
+ 
         const eased = t * t;
         const scale = (1 - eased) * flickerFactor;
 
