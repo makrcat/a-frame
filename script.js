@@ -77,7 +77,7 @@ class Firework {
 }
 
 class Peony extends Firework {
-    constructor(position, color = [1, 0.2, 0.8], VI = 20) {
+    constructor(position, color = [1, 0.2, 0.8], VI = 15) {
         super(position, 1.5, 1, color, 5, 60, VI, 200, 1);
         // launch vi then burst vi
     }
@@ -85,20 +85,20 @@ class Peony extends Firework {
 
 class Willow extends Firework {
     constructor(position, color = [1, 0.2, 0.8] , VI = 10) {
-        super(position, 2, 2.5, color, 200, 60, VI, 40, 8);
+        super(position, 2, 1.5, color, 200, 60, VI, 40, 8);
     }
 }
 
 class Chrysanthemum extends Firework {
-    constructor(position, color = [1, 0.2, 0.8], VI = 25) {
-        super(position, 2, 1.7, color, 25, 60, VI, 200, 1);
+    constructor(position, color = [1, 0.2, 0.8], VI = 20) {
+        super(position, 2, 1.3, color, 25, 60, VI, 200, 1);
         // launch vi then burst vi
     }
 }
 
 class Spider extends Firework {
-    constructor(position, color = [1, 0.2, 0.8], VI = 30) {
-        super(position, 0.5, 0.7, color, 100, 170, VI, 100, 40);
+    constructor(position, color = [1, 0.2, 0.8], VI = 70) {
+        super(position, 0.5, 0.3, color, 100, 170, VI, 60, 30);
         // launch vi then burst vi
     }
 }
@@ -198,13 +198,14 @@ class ParticleObj {
 
     fadehelper(deltaSeconds) {
         const t = 1 - (this.lifetime / this.particleLifetime);
-        const baseOpacity = (1 - t);
+        //const baseOpacity = (1 - t);
+        const baseOpacity = 1 - Math.pow(1 - t, 2); // ok so when it is 1.5 it breaks idk
         const flickerFactor = t > 0.4 ? (Math.random() * 0.6 + 0.4) : (Math.random() * 0.3 + 0.7);
-
         const opacity = baseOpacity * flickerFactor;
 
         const eased = t * t;
         const scale = (1 - eased) * flickerFactor;
+
 
         this.glow.setOpacity(opacity);
         //this.glow.setScale(scale);
@@ -314,8 +315,8 @@ AFRAME.registerComponent('particle-animation', {
             const color = brightcolor();
 
            // const firework = new Willow(position, color);
-            // const firework = new Chrysanthemum(position, color);
-            const firework = new Spider(position, color);
+            const firework = new Chrysanthemum(position, color);
+            //const firework = new Spider(position, color);
 
 
             firework.setupParticles(this.el.sceneEl.object3D);
