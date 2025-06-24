@@ -10,16 +10,15 @@ AFRAME.registerComponent('extended-wasd-controls', {
         this.keys = {};
         this.speed = 0.2;
 
-        // Bind 'this' to the event handlers
+
         this.onKeyDown = this.keydown.bind(this);
         this.onKeyUp = this.keyup.bind(this);
 
-        // Add event listeners
+
         window.addEventListener('keydown', this.onKeyDown);
         window.addEventListener('keyup', this.onKeyUp);
     },
     remove: function () {
-        // Clean up when component is removed
         window.removeEventListener('keydown', this.onKeyDown);
         window.removeEventListener('keyup', this.onKeyUp);
     },
