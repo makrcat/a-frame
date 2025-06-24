@@ -4,7 +4,6 @@
 const THREE = AFRAME.THREE;
 
 
-
 class Firework {
     constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], tail = 15, launchVI = 35, burstVI = 20, particles = 100, BRI = 1) {
         this.position = position.clone();
@@ -78,27 +77,27 @@ class Firework {
 
 class Peony extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 15) {
-        super(position, 1.5, 1, color, 5, 60, VI, 200, 1);
+        super(position, 1.5, 1, color, 5, 40, VI, 200, 1);
         // launch vi then burst vi
     }
 }
 
 class Willow extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 10) {
-        super(position, 2, 2.5, color, 200, 60, VI, 40, 8);
+        super(position, 2, 2.5, color, 200, 30, VI, 40, 8);
     }
 }
 
 class Chrysanthemum extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 20) {
-        super(position, 2, 1.6, color, 25, 60, VI, 200, 1);
+        super(position, 2, 1.6, color, 25, 40, VI, 200, 1);
         // launch vi then burst vi
     }
 }
 
 class Spider extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 70) {
-        super(position, 0.5, 1.2, color, 100, 100, VI, 60, 30);
+        super(position, 0.5, 1.2, color, 100, 50, VI, 60, 30);
         // launch vi then burst vi
     }
 }
@@ -300,7 +299,7 @@ AFRAME.registerComponent('particle-animation', {
         this.fireworks = [];
         this.startTimes = [];
 
-        const basePosition = new THREE.Vector3(-50, 0, -100);
+        const basePosition = new THREE.Vector3(-50, 0, -70);
 
         for (let i = 0; i < this.data.count; i++) {
             const position = new THREE.Vector3(
@@ -321,6 +320,7 @@ AFRAME.registerComponent('particle-animation', {
             // Record when each firework is allowed to start (staggered)
             this.startTimes.push(i * this.data.staggerTime);
         }
+
 
         this.elapsed = 0;
     },
