@@ -27,24 +27,26 @@
     <a-scene light="defaultLightsEnabled: false" shadow="enabled: true; type: pcfs" spawn-houses>
 
         <!-- plane -->
-        <a-plane rotation="-90 0 0" width="200" height="200" color="#7BC8A4"></a-plane>
+        <a-plane rotation="-90 -1 0" width="100" height="100" color="#7BC8A4"></a-plane>
 
         <!-- sky -->
 
-        <a-sky color="#0c1445"></a-sky>
+        <a-sky color="#000025"></a-sky>
 
 
         <!--cam-->
-        <a-camera position="0 5 45" look-controls="pointerLockEnabled: true"></a-camera>
+        <!--1.3684590296822483-->
+
+        <a-camera position=" -4.22631077911584 7.416666666666692 0.436799087409643"   extended-wasd-controls  keyboard-movement look-controls="pointerLockEnabled: true">
+
+     
+
+
+        </a-camera>
 
         <!-- light -->
 
-        <a-light type="directional" intensity="0.2" position="2 4 4" cast-shadow="true" shadow-map-width="1024"
-            shadow-map-height="1024" shadow-camera-near="0.5" shadow-camera-far="20" shadow-camera-left="-5"
-            shadow-camera-right="5" shadow-camera-top="5" shadow-camera-bottom="-5">
-        </a-light>
-
-        <a-entity light="type: ambient; color: #FFFFFF; intensity: 0.05"></a-entity>
+        <a-entity light="type: ambient; color: #FFFFFF; intensity: 0.3"></a-entity>
 
         <a-sphere position="0 400 -5" radius="10" material="color: white; emissive: white; emissiveIntensity: 2">
         </a-sphere>
@@ -52,31 +54,54 @@
         <a-entity particle-animation position="0 0 0"></a-entity>
         <!-- wall -->
 
-        <a-box position="-1 0.5 0" width="2" height="1" depth="2" src="#wall-texture"></a-box>
+        <a-entity gltf-model="#house" position="-30 0 0" scale="0.4 0.4 0.4" rotation="0 180 0 "></a-entity>
 
-        <!--road-->
-        <a-box position="0 0 10" width="80" height="1.5" depth="1.5" material="repeat: 20 1;"
-            src="#sidewalk-texture"></a-box>
+        <a-entity position="8.55 11.3 -5.85" light="type: point; color: #fff; intensity: 0.25; distance: 15">
+            <a-box color="#ffff00" position="0 0 0" scale="1.15 1.15 1.15"
+                material="emissive: #fffff0; emissiveIntensity: 0.6"></a-box>
+        </a-entity>
 
-        <a-box position="0 -1 15" width="80" height="3" depth="10" material="repeat: 10 1;" src="#road-texture"></a-box>
+        <a-entity position="8.55 11.3 7.15" light="type: point; color: #fff; intensity: 0.25; distance: 15">
+            <a-box color="#ffff00" position="0 0 0" scale="1.15 1.15 1.15"
+                material="emissive: #fffff0; emissiveIntensity: 0.6"></a-box>
+        </a-entity>
+
+        <a-entity position="-15.6 11.3 20.1" light="type: point; color: #fff; intensity: 0.25; distance: 15">
+            <a-box color="#ffff00" position="0 0 0" scale="1.15 1.15 1.15"
+                material="emissive: #fffff0; emissiveIntensity: 0.6"></a-box>
+        </a-entity>
 
 
-        <a-entity position="-1 1 0" scale="1.2" material="src: #roof-texture; side: double; roughness: 1"
-            geometry=" primitive: custom-geometry"></a-entity>
+        <a-entity position="8.65 11.3 20.1" light="type: point; color: #fff; intensity: 0.25; distance: 15">
+            <a-box color="#ffff00" position="0 0 0" scale="1.15 1.15 1.15"
+                material="emissive: #fffff0; emissiveIntensity: 0.6"></a-box>
+        </a-entity>
 
-        <a-entity id="house-container" position="-10 0 0"></a-entity>
 
-        <a-entity gltf-model="#playstructure" position="0 0 50"></a-entity>
+        <a-entity position="-34.75 11.3 -1.07" light="type: point; color: #fff; intensity: 0.25; distance: 15">
+            <a-box color="#ffff00" position="0 0 0" scale="1.5 1.15 1.15"
+                material="emissive: #fffff0; emissiveIntensity: 0.6"></a-box>
+        </a-entity>
+
+
+        <a-entity position="-34.75 11.3 14.27" light="type: point; color: #fff; intensity: 0.25; distance: 15">
+            <a-box color="#ffff00" position="0 0 0" scale="1.5 1.15 1.15"
+                material="emissive: #fffff0; emissiveIntensity: 0.6"></a-box>
+        </a-entity>
+
+
+        <a-entity gltf-model="#playstructure" unlit-material position="0 2 0" rotation="0 90 0"
+            material="lighting: false"></a-entity>
+
+        <a-entity gltf-model="#baking" position="0 2 0" rotation="0 90 0"></a-entity>
+
 
 
         <a-assets>
-            <img id="wall-texture" src="roof.png" />
-            <img id="roof-texture" src="roof.png" />
-            <img id="sidewalk-texture" src="sidewalk.png" />
-            <img id="road-texture" src="asphalt.jpg" />
-            <a-asset-item id="house" src="models/house.glb"></a-asset-item>
-            <a-asset-item id="playstructure" src="models/houseee.glb"></a-asset-item>
 
+            <a-asset-item id="house" src="models/house.glb"></a-asset-item>
+            <a-asset-item id="playstructure" src="models/oktest.glb"></a-asset-item>
+            <a-asset-item id="baking" src="models/ihatebaking.glb"></a-asset-item>
 
         </a-assets>
 
@@ -86,26 +111,29 @@
 
 
     <script src="script.js"></script>
+    <script src="updowncontrols.js"></script>
+
     <script>
-        AFRAME.registerComponent('spawn-houses', {
+        AFRAME.registerComponent('unlit-material', {
             init: function () {
-                const container = document.querySelector('#house-container');
-
-                const count = 4; // number of houses
-                const spacing = 20; // spacing between houses
-
-                for (let i = 0; i < count; i++) {
-                    const house = document.createElement('a-entity');
-                    house.setAttribute('gltf-model', '#house');
-                    house.setAttribute('scale', '0.7 0.7 0.7');
-                    house.setAttribute('material', 'color: #8B0000');
-                    house.setAttribute('position', `${i * spacing} 0 0`);
-                    house.setAttribute('rotation', '0 90 0');
-                    container.appendChild(house);  // append to container
-                }
+                const el = this.el;
+                el.addEventListener('model-loaded', () => {
+                    const mesh = el.getObject3D('mesh');
+                    if (!mesh) return;
+                    mesh.traverse(node => {
+                        if (node.isMesh) {
+                            node.material = new THREE.MeshBasicMaterial({
+                                map: node.material.map,
+                                transparent: node.material.transparent,
+                                alphaTest: node.material.alphaTest,
+                            });
+                        }
+                    });
+                });
             }
         });
     </script>
+
 </body>
 
 </html>
