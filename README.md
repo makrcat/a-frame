@@ -4,7 +4,6 @@ Fireworks & a playground. Made with Blender, THREE.js, and A-FRAME over about a 
 This is my submission for the [Frappucino hackathon](https://hackaccino.hackclub.com/) of 
 [hack club](https://hackclub.com) 😋
 
-
 ## Notes
 
 Models not listed at the bottom are OC, namely the playground lol.

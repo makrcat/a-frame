@@ -1,6 +1,6 @@
 //@ts-check
 
-// Add this to inform TypeScript about window.settings
+
 /**
  * @type {any}
  */
@@ -201,6 +201,7 @@ class Crossette {
 }
 
 function getRandomDirection() {
+    // thx gpt
     const theta = Math.random() * 2 * Math.PI; // 0 to 2π
     const phi = Math.acos(2 * Math.random() - 1); // Correctly distribute points on sphere (0 to π)
     return { theta, phi };
@@ -208,9 +209,15 @@ function getRandomDirection() {
 
 
 
+/*
+constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], 
+
+tail = 15, launchVI = 35, burstVI = 20, particles = 100, BRI = 1, defaultDirection = { theta: Math.PI, phi: 0 }) {
+*/
+
 class Peony extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 15) {
-        super(position, 1.5, 1, color, 5, 40, VI, 200, 1);
+        super(position, 1.5, 1, color, 20, 40, VI, 200, 1);
         // launch vi then burst vi
     }
 }
@@ -223,7 +230,7 @@ class Willow extends Firework {
 
 class Chrysanthemum extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 20) {
-        super(position, 2, 1.6, color, 25, 40, VI, 200, 1);
+        super(position, 2, 1.6, color, 40, 40, VI, 200, 1);
         // launch vi then burst vi
     }
 }
