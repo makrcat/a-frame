@@ -26,9 +26,9 @@ https://creativecommons.org/licenses/by/4.0/
 
 | Img | Thing | User | Link | 
 |-----|-------|------|------|
-| <img src="icon/bench.png" height="100" > | low poly bench | @JustBlender | [Sketchfab](https://sketchfab.com/3d-models/low-poly-bench-3-4408281074eb4c30afafd96c7c421193) |
-| <img src="icon/bucket.png" height="100"> | beach buckets | @kyanaa | [Sketchfab](https://sketchfab.com/3d-models/beach-buckets-db3bb3d41e934947b65d952bdc4e5280) |
-| <img src="icon/conifer.png" height="100"> | conifer tree | @Sereib | [Sketchfab](https://sketchfab.com/3d-models/conifer-medium-poly-38fb9cc46832422fb9bded278134ad83) |
-| <img src="icon/flowers.png" height="100"> | blanket phlox | @E.A.Cornell | [Sketchfab](https://sketchfab.com/3d-models/blanket-phlox-69bf5e21f767419dafec910f7a6be799) |
-| <img src="icon/table.png" height="100"> | picnic table | @MaX3Dd | [Sketchfab](https://sketchfab.com/3d-models/picnic-table-low-poly-0781d9085e764583bc0a61f26cd4d01e) |
-| <img src="icon/lamp.png" height="100"> | lamp posts | @bazsa | [Free3D](https://free3d.com/3d-model/street-lamp-40556.html) |
+| <img src="icons/bench.png" height="100" > | low poly bench | @JustBlender | [Sketchfab](https://sketchfab.com/3d-models/low-poly-bench-3-4408281074eb4c30afafd96c7c421193) |
+| <img src="icons/bucket.png" height="100"> | beach buckets | @kyanaa | [Sketchfab](https://sketchfab.com/3d-models/beach-buckets-db3bb3d41e934947b65d952bdc4e5280) |
+| <img src="icons/conifer.png" height="100"> | conifer tree | @Sereib | [Sketchfab](https://sketchfab.com/3d-models/conifer-medium-poly-38fb9cc46832422fb9bded278134ad83) |
+| <img src="icons/flowers.png" height="100"> | blanket phlox | @E.A.Cornell | [Sketchfab](https://sketchfab.com/3d-models/blanket-phlox-69bf5e21f767419dafec910f7a6be799) |
+| <img src="icons/table.png" height="100"> | picnic table | @MaX3Dd | [Sketchfab](https://sketchfab.com/3d-models/picnic-table-low-poly-0781d9085e764583bc0a61f26cd4d01e) |
+| <img src="icons/lamp.png" height="100"> | lamp posts | @bazsa | [Free3D](https://free3d.com/3d-model/street-lamp-40556.html) |
