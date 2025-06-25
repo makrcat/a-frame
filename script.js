@@ -4,8 +4,9 @@
 const THREE = AFRAME.THREE;
 
 
+
 class Firework {
-    constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], tail = 15, launchVI = 35, burstVI = 20, particles = 100, BRI = 1) {
+    constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], tail = 15, launchVI = 35, burstVI = 20, particles = 100, BRI = 1, defaultDirection = {theta: Math.PI, phi: 0}) {
         this.position = position.clone();
         this.LL = LL;
         this.PTL = PTL;
@@ -15,16 +16,21 @@ class Firework {
         this.first = null;
         this.color = new THREE.Color(...color),
             this.tail = tail;
+        
         this.launchVI = launchVI;
         this.burstVI = burstVI;
         this.burstRandVI = BRI;
         this.particleCount = particles
+
+        this.defaultDirection = defaultDirection;
     }
 
     setupParticles(THREEscene) {
         const particleCount = this.particleCount;
 
-        let a = new ParticleObj(THREEscene, this.launchVI, Math.PI, 0, this.LL, this.position, this.color, this.tail);
+        const {theta, phi} = this.defaultDirection;
+
+        let a = new ParticleObj(THREEscene, this.launchVI, theta, phi, this.LL, this.position, this.color, this.tail);
         a.scale(3);
         a.setup();
         this.first = a;
@@ -43,13 +49,24 @@ class Firework {
         }
     }
 
+    setSpawnPosition(pos) {
+        // should run aftersteup particles, right before explod
+        this.position = pos.clone();
+        this.first?.updatePosition(pos);
+
+        for (const p of this.particles) {
+            p.updatePosition(pos);
+        }
+    }
+
     update(deltaSeconds) {
+        this.elapsedTime += deltaSeconds;
         if (this.state === "launch") {
 
             //@ts-ignore
             this.first.update(deltaSeconds);
 
-            this.elapsedTime += deltaSeconds;
+            
 
             if (this.elapsedTime >= this.LL) {
                 this.state = "explode";
@@ -75,6 +92,95 @@ class Firework {
 
 }
 
+class Crossette {
+    constructor(position, color = [1, 0.1, 0], launchVI = 30) {
+        this.position = position.clone();
+
+        this.color = color;
+        this.smallFireworks = [];
+        this.state = "launch";
+        this.elapsedTime = 0;
+
+        this.first = null;
+        this.launchVI = launchVI;
+
+        this.tail = 50;
+        this.LL = 1.0; 
+
+        // chrys fireworks
+        for (let i = 0; i < 5; i++) {
+            const { theta, phi } = getRandomDirection();
+            const smallFirework = new Firework(
+                position,
+                1.0,
+                1.5,
+                color,
+                10,
+                15,
+                10,
+                20,
+                1,
+                {theta, phi}
+            );
+            this.smallFireworks.push(smallFirework);
+        }
+    }
+
+    setupParticles(THREEscene) {
+        let a = new ParticleObj(THREEscene, this.launchVI, Math.PI, 0, this.LL, this.position, this.color, this.tail);
+        a.scale(3);
+        a.setup();
+        this.first = a;
+
+        
+        this.smallFireworks.forEach(fw => fw.setupParticles(THREEscene));
+    }
+
+
+
+    update(deltaSeconds) {
+        console.log("upd");
+        this.elapsedTime += deltaSeconds;
+        if (this.state === "launch") {
+
+            //@ts-ignore
+            this.first.update(deltaSeconds);
+
+
+            if (this.elapsedTime >= this.LL) {
+                this.state = "explode";
+                this.first?.setOpacity(0);
+
+                //@ts-ignore
+                for (const p of this.first?.trailSprites) {
+                    p.material.opacity = 0;
+                }
+
+                for (const f of this.smallFireworks) {
+
+                    f.setSpawnPosition(this.first?.position);
+                    console.log(f);
+    
+                }
+            }
+
+        } else if (this.state === "explode") {
+            for (const f of this.smallFireworks) {
+                f.update(deltaSeconds);
+            }
+        }
+    }
+
+}
+
+function getRandomDirection() {
+  const theta = Math.random() * 2 * Math.PI; // 0 to 2π
+  const phi = Math.acos(2 * Math.random() - 1); // Correctly distribute points on sphere (0 to π)
+  return { theta, phi };
+}
+
+
+
 class Peony extends Firework {
     constructor(position, color = [1, 0.2, 0.8], VI = 15) {
         super(position, 1.5, 1, color, 5, 40, VI, 200, 1);
@@ -96,8 +202,8 @@ class Chrysanthemum extends Firework {
 }
 
 class Spider extends Firework {
-    constructor(position, color = [1, 0.2, 0.8], VI = 70) {
-        super(position, 0.5, 1.2, color, 100, 50, VI, 60, 30);
+    constructor(position, color = [1, 0.2, 0.8], VI = 40) {
+        super(position, 0.8, 1, color, 100, 40, VI, 60, 30);
         // launch vi then burst vi
     }
 }
@@ -136,6 +242,12 @@ class ParticleObj {
         this.core.setOpacity(0);
 
         // 
+    }
+
+    setDirectionFromSpherical(speed, theta, phi) {
+        this.speed = speed;
+        this.theta = theta;
+        this.phi = phi;
     }
 
     setup() {
@@ -291,8 +403,8 @@ function brightcolor() {
 // @ts-ignore typescript pllease stop
 AFRAME.registerComponent('particle-animation', {
     schema: {
-        count: { type: 'int', default: 5 },
-        staggerTime: { type: 'number', default: 5000 }
+        count: { type: 'int', default: 15 },
+        staggerTime: { type: 'number', default: 2000 }
     },
 
     init: function () {
@@ -309,10 +421,10 @@ AFRAME.registerComponent('particle-animation', {
             );
             const color = brightcolor();
 
-            // const firework = new Willow(position, color);
-            const firework = new Chrysanthemum(position, color);
-            //const firework = new Spider(position, color);
-
+            const fireworkClasses = [Willow, Chrysanthemum, Spider, Peony, Crossette];
+            const randomIndex = Math.floor(Math.random() * fireworkClasses.length);
+            const FireworkClass = fireworkClasses[randomIndex];
+            const firework = new FireworkClass(position, color);
 
             firework.setupParticles(this.el.sceneEl.object3D);
             this.fireworks.push(firework);
