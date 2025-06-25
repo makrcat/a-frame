@@ -1,5 +1,13 @@
 //@ts-check
 
+// Add this to inform TypeScript about window.settings
+/**
+ * @type {any}
+ */
+
+//@ts-ignore
+window.settings = window.settings || { spawnDelay: 2000 };
+
 //@ts-ignore
 const THREE = AFRAME.THREE;
 
@@ -444,76 +452,51 @@ function brightcolor() {
     return c.map(v => v / max);
 }
 
+function merica() {
+  const baseColors = {
+    red:    [0.8, 0.1, 0.1],
+    orange:    [0.8, 0.4, 0.1],
+    white:  [0.8, 0.8, 0.8],
+    blue:   [0.1, 0.1, 0.8],
+    yellow: [0.8, 0.6, 0.1],
+    lightblue: [0.3, 0.3, 0.7],
+  };
 
-// A-FRAME
-// @ts-ignore typescript pllease stop
+  const keys = Object.keys(baseColors);
+  const choice = keys[Math.floor(Math.random() * keys.length)];
+  const base = baseColors[choice];
 
-/*
-AFRAME.registerComponent('particle-animation', {
-    schema: {
-        count: { type: 'int', default: 15 },
-        staggerTime: { type: 'number', default: 1500 }
-    },
+  return base.map(c => c * (0.7 + Math.random() * 0.3));
+}
 
-    init: function () {
-        this.fireworks = [];
-        this.startTimes = [];
+function newyear() {
+  const baseColors = {
+    gold:   [1, 0.84, 0],   
+    silver: [0.75, 0.75, 0.75], 
+    red:    [0.8, 0.2, 0.2],
+    red_again:  [0.6, 0.1, 0.1],
+    
+    orange:    [0.8, 0.4, 0.1],
+    white:  [0.8, 0.8, 0.8],
+    yellow: [0.7, 0.6, 0.1],
+    blue:   [0.1 , 0.1, 0.6],
+    pink: [0.984, 0.776, 0.812],
 
-        const basePosition = new THREE.Vector3(-50, 0, -70);
+    lightGold:[1, 0.9, 0.4],
+  };
 
-        for (let i = 0; i < this.data.count; i++) {
-            const position = new THREE.Vector3(
-                basePosition.x + (Math.random()) * 100,
-                basePosition.y,
-                basePosition.z - (Math.random()) * 25,
-            );
-            const color = brightcolor();
+  const keys = Object.keys(baseColors);
+  const choice = keys[Math.floor(Math.random() * keys.length)];
+  const base = baseColors[choice];
 
-            const fireworkClasses = 
-            [Willow, Chrysanthemum, Spider, Peony, Crossette, Crossette];
-
-            const randomIndex = Math.floor(Math.random() * fireworkClasses.length);
-            const FireworkClass = fireworkClasses[randomIndex];
-            const firework = new FireworkClass(position, color);
-
-            firework.setupParticles(this.el.sceneEl.object3D);
-            this.fireworks.push(firework);
-
-            this.startTimes.push(i * this.data.staggerTime);
-        }
-
-
-        this.elapsed = 0;
-    },
-
-    tick: function (time, delta) {
-        const deltaSeconds = delta / 1000;
-        this.elapsed += delta;
-
-        /// fix this
-        // Update fireworks in reverse order so we can safely remove finished ones
-        for (let i = this.fireworks.length - 1; i >= 0; i--) {
-            if (this.elapsed >= this.startTimes[i]) {
-
-
-                const done = this.fireworks[i].update(deltaSeconds);
-                if (done) {
-                    // If firework signals it's done, remove it and its startTime
-                    this.fireworks.splice(i, 1);
-                    this.startTimes.splice(i, 1);
-                }
-            }
-        }
-    }
-});
-
-*/
+  return base.map(c => c * (0.7 + Math.random() * 0.3));
+}
 
 //@ts-ignore
 // fixed
 AFRAME.registerComponent('particle-animation', {
     schema: {
-        maxActive: { type: 'int', default: 5 }
+        maxActive: { type: 'int', default: 8 }
     },
 
     init: function () {
@@ -529,18 +512,31 @@ AFRAME.registerComponent('particle-animation', {
         const deltaSeconds = delta / 1000;
         this.elapsed += delta;
 
- 
+
         if (this.elapsed >= this.nextSpawnTime) {
             this.spawnFirework();
-            this.nextSpawnTime = this.elapsed + Math.floor(Math.random() * 1500 + 1000); 
+
+            //@ts-ignore
+            this.nextSpawnTime = this.elapsed + Math.floor(Math.random() * 500 + window.settings["spawnDelay"]);
         }
 
         // update all fireworks
         for (let i = 0; i < this.fireworks.length; i++) {
-            this.fireworks[i].update(deltaSeconds);
+            let f = this.fireworks[i];
+            f.update(deltaSeconds);
+
+
+            // dispose if its over
+
+            if (f.elapsedTime > f.LL + f.PTL) {
+                f.dispose();
+                this.fireworks.splice(i, 1);
+                this.startTimes.splice(i, 1);
+                // delete
+            }
         }
 
-        // delete if over 5 activate
+        // hard delete
         while (this.fireworks.length > this.data.maxActive) {
             const removed = this.fireworks.shift();
             removed.dispose?.(); // clean up materials and geometry!!
@@ -555,9 +551,31 @@ AFRAME.registerComponent('particle-animation', {
             this.basePosition.z - Math.random() * 25
         );
 
-        const color = brightcolor();
-        const fireworkClasses = [Willow, Chrysanthemum, Spider, Peony, Crossette, Crossette];
-        const FireworkClass = fireworkClasses[Math.floor(Math.random() * fireworkClasses.length)];
+
+        let color;
+        //@ts-ignore
+        switch (window.settings["theme"]) {
+            case "July4": color = merica(); break;
+            case "New year": color = newyear(); break;
+
+            default: color = brightcolor();
+        }
+
+
+        let FireworkClass;
+
+        //@ts-ignore
+        switch (window.settings["fireworkType"]) {
+            case "Peony": FireworkClass = Peony; break;
+            case "Willow": FireworkClass = Willow; break;
+            case "Chrysanthemum": FireworkClass = Chrysanthemum; break;
+            case "Spider": FireworkClass = Spider; break;
+            case "Crossette": FireworkClass = Crossette; break;
+
+            default:
+                const fireworkClasses = [Willow, Chrysanthemum, Spider, Peony, Crossette, Crossette];
+                FireworkClass = fireworkClasses[Math.floor(Math.random() * fireworkClasses.length)];
+        }
 
         const firework = new FireworkClass(position, color);
         firework.setupParticles(this.el.sceneEl.object3D);
@@ -567,9 +585,10 @@ AFRAME.registerComponent('particle-animation', {
     },
 
     dispose: function () {
-        if (this.first?.dispose) this.first.dispose();
+
+        this.first.dispose();
         for (const p of this.particles) {
-            if (p?.dispose) p.dispose();
+            p.dispose();
         }
         this.particles = [];
     }

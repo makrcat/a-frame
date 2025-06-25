@@ -139,12 +139,12 @@
             </div>
 
             <h3>Made for <a href="https://hackaccino.hackclub.com/">hackaccino</a></h3>
-            <p>using A-FRAME, Blender, and Three.js</p>
+            <p>using A-FRAME, Blender, Three.js, lil-gui</p>
             <a href="https://github.com/makrcat/a-frame">The code :)</a>
         </div>
     </div>
 
-    <a-scene light="defaultLightsEnabled: false" shadow="enabled: true; type: pcfs" spawn-houses>
+    <a-scene light="defaultLightsEnabled: false" shadow="enabled: true; type: pcfs" >
 
         <!-- plane -->
         <a-plane rotation="-90 -1 0" width="100" height="100" color="#7BC8A4"></a-plane>
@@ -173,7 +173,7 @@
         <a-entity particle-animation position="0 0 0"></a-entity>
         <!-- wall -->
 
-        <a-entity gltf-model="#house" position="-30 0 0" scale="0.4 0.4 0.4" rotation="0 180 0 "></a-entity>
+        <a-entity gltf-model="#house" position="-40 2 0" scale="0.4 0.4 0.4" rotation="0 180 0 "></a-entity>
 
         <a-entity position="8.55 11.3 -5.85" light="type: point; color: #fff; intensity: 0.25; distance: 15">
             <a-box color="#ffff00" position="0 0 0" scale="1.15 1.15 1.15"
@@ -260,6 +260,26 @@
             panel.classList.toggle('collapsed');
             tab.innerHTML = panel.classList.contains('collapsed') ? '&lt;' : '&gt;';
         });
+    </script>
+
+
+    <script>
+        window.settings = {
+            spawnDelay: 1500,
+            fireworkType: 'All',
+            theme: 'Misc',
+        };
+    </script>
+
+    <script type="module">
+        import GUI from 'https://cdn.skypack.dev/lil-gui';
+
+        const gui = new GUI();
+        gui.add(window.settings, 'spawnDelay', 250, 4000);
+        
+        gui.add(window.settings, 'fireworkType', ['All', 'Peony', 'Chrysanthemum', 'Willow', 'Spider', 'Crossette']);
+
+        gui.add(settings, 'theme', ['Misc', 'July4', 'New year']);
     </script>
 
 </body>
