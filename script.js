@@ -6,7 +6,7 @@ const THREE = AFRAME.THREE;
 
 
 class Firework {
-    constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], tail = 15, launchVI = 35, burstVI = 20, particles = 100, BRI = 1, defaultDirection = {theta: Math.PI, phi: 0}) {
+    constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], tail = 15, launchVI = 35, burstVI = 20, particles = 100, BRI = 1, defaultDirection = { theta: Math.PI, phi: 0 }) {
         this.position = position.clone();
         this.LL = LL;
         this.PTL = PTL;
@@ -16,7 +16,7 @@ class Firework {
         this.first = null;
         this.color = new THREE.Color(...color),
             this.tail = tail;
-        
+
         this.launchVI = launchVI;
         this.burstVI = burstVI;
         this.burstRandVI = BRI;
@@ -28,7 +28,7 @@ class Firework {
     setupParticles(THREEscene) {
         const particleCount = this.particleCount;
 
-        const {theta, phi} = this.defaultDirection;
+        const { theta, phi } = this.defaultDirection;
 
         let a = new ParticleObj(THREEscene, this.launchVI, theta, phi, this.LL, this.position, this.color, this.tail);
         a.scale(3);
@@ -66,7 +66,7 @@ class Firework {
             //@ts-ignore
             this.first.update(deltaSeconds);
 
-            
+
 
             if (this.elapsedTime >= this.LL) {
                 this.state = "explode";
@@ -90,6 +90,16 @@ class Firework {
         }
     }
 
+    dispose() {
+        this.first?.dispose?.();
+
+        for (const p of this.particles) {
+            p.dispose?.();
+        }
+        this.particles = [];
+    }
+
+
 }
 
 class Crossette {
@@ -105,7 +115,7 @@ class Crossette {
         this.launchVI = launchVI;
 
         this.tail = 50;
-        this.LL = 1.0; 
+        this.LL = 1.0;
 
         // chrys fireworks
         for (let i = 0; i < 5; i++) {
@@ -115,12 +125,12 @@ class Crossette {
                 1.0,
                 1.5,
                 color,
-                10,
-                15,
-                10,
-                20,
+                10, // tail
+                20, // launchVI 
+                20, // burstVI
+                20, // particles
                 1,
-                {theta, phi}
+                { theta, phi }
             );
             this.smallFireworks.push(smallFirework);
         }
@@ -132,14 +142,13 @@ class Crossette {
         a.setup();
         this.first = a;
 
-        
+
         this.smallFireworks.forEach(fw => fw.setupParticles(THREEscene));
     }
 
 
 
     update(deltaSeconds) {
-        console.log("upd");
         this.elapsedTime += deltaSeconds;
         if (this.state === "launch") {
 
@@ -160,7 +169,7 @@ class Crossette {
 
                     f.setSpawnPosition(this.first?.position);
                     console.log(f);
-    
+
                 }
             }
 
@@ -171,12 +180,22 @@ class Crossette {
         }
     }
 
+    dispose() {
+        this.first?.dispose?.();
+
+        for (const f of this.smallFireworks) {
+            f.dispose?.();
+        }
+
+        this.smallFireworks = [];
+    }
+
 }
 
 function getRandomDirection() {
-  const theta = Math.random() * 2 * Math.PI; // 0 to 2π
-  const phi = Math.acos(2 * Math.random() - 1); // Correctly distribute points on sphere (0 to π)
-  return { theta, phi };
+    const theta = Math.random() * 2 * Math.PI; // 0 to 2π
+    const phi = Math.acos(2 * Math.random() - 1); // Correctly distribute points on sphere (0 to π)
+    return { theta, phi };
 }
 
 
@@ -202,7 +221,7 @@ class Chrysanthemum extends Firework {
 }
 
 class Spider extends Firework {
-    constructor(position, color = [1, 0.2, 0.8], VI = 40) {
+    constructor(position, color = [1, 0.2, 0.8], VI = 30) {
         super(position, 0.8, 1, color, 100, 40, VI, 60, 30);
         // launch vi then burst vi
     }
@@ -225,7 +244,6 @@ class ParticleObj {
         this.trailSprites = [];
         this.color = color;
         this.tailLength = tail;
-
 
         this.velocity = new THREE.Vector3(
             speed * Math.sin(phi) * Math.cos(theta),
@@ -354,6 +372,27 @@ class ParticleObj {
         this.glow.setOpacity(n);
         this.core.setOpacity(n);
     }
+
+    dispose() {
+        // Remove and dispose glow + core
+        if (this.glow?.sprite) {
+            this.scene.remove(this.glow.sprite);
+            this.glow.dispose();
+        }
+        if (this.core?.sprite) {
+            this.scene.remove(this.core.sprite);
+            this.core.dispose();
+        }
+
+        // Remove and dispose trail sprites
+        for (const sprite of this.trailSprites) {
+            this.scene.remove(sprite);
+            if (sprite.material.map) sprite.material.map.dispose();
+            sprite.material.dispose();
+        }
+
+        this.trailSprites = [];
+    }
 }
 
 // glasses
@@ -369,6 +408,13 @@ class GlowParticle {
         });
         this.sprite = new THREE.Sprite(material);
         this.sprite.scale.set(size, size, size);
+    }
+
+    dispose() {
+        if (this.sprite?.material.map) {
+            this.sprite.material.map.dispose();
+        }
+        this.sprite.material.dispose();
     }
 
     addTo(scene) {
@@ -401,10 +447,12 @@ function brightcolor() {
 
 // A-FRAME
 // @ts-ignore typescript pllease stop
+
+/*
 AFRAME.registerComponent('particle-animation', {
     schema: {
         count: { type: 'int', default: 15 },
-        staggerTime: { type: 'number', default: 2000 }
+        staggerTime: { type: 'number', default: 1500 }
     },
 
     init: function () {
@@ -421,7 +469,9 @@ AFRAME.registerComponent('particle-animation', {
             );
             const color = brightcolor();
 
-            const fireworkClasses = [Willow, Chrysanthemum, Spider, Peony, Crossette];
+            const fireworkClasses = 
+            [Willow, Chrysanthemum, Spider, Peony, Crossette, Crossette];
+
             const randomIndex = Math.floor(Math.random() * fireworkClasses.length);
             const FireworkClass = fireworkClasses[randomIndex];
             const firework = new FireworkClass(position, color);
@@ -429,7 +479,6 @@ AFRAME.registerComponent('particle-animation', {
             firework.setupParticles(this.el.sceneEl.object3D);
             this.fireworks.push(firework);
 
-            // Record when each firework is allowed to start (staggered)
             this.startTimes.push(i * this.data.staggerTime);
         }
 
@@ -441,9 +490,12 @@ AFRAME.registerComponent('particle-animation', {
         const deltaSeconds = delta / 1000;
         this.elapsed += delta;
 
+        /// fix this
         // Update fireworks in reverse order so we can safely remove finished ones
         for (let i = this.fireworks.length - 1; i >= 0; i--) {
             if (this.elapsed >= this.startTimes[i]) {
+
+
                 const done = this.fireworks[i].update(deltaSeconds);
                 if (done) {
                     // If firework signals it's done, remove it and its startTime
@@ -455,3 +507,70 @@ AFRAME.registerComponent('particle-animation', {
     }
 });
 
+*/
+
+//@ts-ignore
+// fixed
+AFRAME.registerComponent('particle-animation', {
+    schema: {
+        maxActive: { type: 'int', default: 5 }
+    },
+
+    init: function () {
+        this.fireworks = [];
+        this.startTimes = [];
+        this.elapsed = 0;
+        this.nextSpawnTime = 0;
+
+        this.basePosition = new THREE.Vector3(-50, 0, -70);
+    },
+
+    tick: function (time, delta) {
+        const deltaSeconds = delta / 1000;
+        this.elapsed += delta;
+
+ 
+        if (this.elapsed >= this.nextSpawnTime) {
+            this.spawnFirework();
+            this.nextSpawnTime = this.elapsed + Math.floor(Math.random() * 1500 + 1000); 
+        }
+
+        // update all fireworks
+        for (let i = 0; i < this.fireworks.length; i++) {
+            this.fireworks[i].update(deltaSeconds);
+        }
+
+        // delete if over 5 activate
+        while (this.fireworks.length > this.data.maxActive) {
+            const removed = this.fireworks.shift();
+            removed.dispose?.(); // clean up materials and geometry!!
+            this.startTimes.shift();
+        }
+    },
+
+    spawnFirework: function () {
+        const position = new THREE.Vector3(
+            this.basePosition.x + Math.random() * 100,
+            this.basePosition.y,
+            this.basePosition.z - Math.random() * 25
+        );
+
+        const color = brightcolor();
+        const fireworkClasses = [Willow, Chrysanthemum, Spider, Peony, Crossette, Crossette];
+        const FireworkClass = fireworkClasses[Math.floor(Math.random() * fireworkClasses.length)];
+
+        const firework = new FireworkClass(position, color);
+        firework.setupParticles(this.el.sceneEl.object3D);
+
+        this.fireworks.push(firework);
+        this.startTimes.push(this.elapsed);
+    },
+
+    dispose: function () {
+        if (this.first?.dispose) this.first.dispose();
+        for (const p of this.particles) {
+            if (p?.dispose) p.dispose();
+        }
+        this.particles = [];
+    }
+});
