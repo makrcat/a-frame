@@ -259,8 +259,8 @@ class ParticleObj {
             speed * Math.sin(phi) * Math.sin(theta)
         );
 
-        this.glow = new GlowParticle('soft-circle.png', color); // [1, 0.1, 0]
-        this.core = new GlowParticle('core-circle.png', color);
+        this.glow = new GlowParticle('assets/soft-circle.png', color); // [1, 0.1, 0]
+        this.core = new GlowParticle('assets/core-circle.png', color);
         this.glow.setPosition(this.position);
         this.core.setPosition(this.position);
 
