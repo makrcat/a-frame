@@ -28,10 +28,10 @@ AFRAME.registerComponent('extended-wasd-controls', {
         const position = el.getAttribute('position');
         const moveSpeed = this.speed * (data.acceleration / 60);
 
-        if (this.keys['Digit3'] || this.keys['PageUp']) {
+        if (this.keys['KeyE'] || this.keys['PageUp']) {
             position.y += moveSpeed;
         }
-        if (this.keys['KeyZ'] || this.keys['PageDown']) {
+        if (this.keys['KeyQ'] || this.keys['PageDown']) {
             position.y -= moveSpeed;
         }
         el.setAttribute('position', position);

@@ -1,4 +1,4 @@
-## Late-night July lights from a slide 🛝🎆
+## Late-night July 🛝🎆
 Fireworks & a playground. Made with Blender, THREE.js, and A-FRAME over about a week. 
 
 This is my submission for the [Frappucino hackathon](https://hackaccino.hackclub.com/) of 

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Three.js Basics</title>
+    <title>One time</title>
     <meta name="viewport" content="width=device-width">
     <link href="style.css" rel="stylesheet" type="text/css" />
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
@@ -13,6 +13,11 @@
 
 
     <style>
+        div {
+            box-sizing: border-box;
+
+        }
+
         body {
             margin: 0;
         }
@@ -20,10 +25,125 @@
         canvas {
             display: block;
         }
+
+        .wasd-grid {
+            /*translate*/
+
+            display: grid;
+            grid-template-columns: repeat(3, 40px);
+            grid-template-rows: repeat(2, 40px);
+            gap: 5px;
+        }
+
+        .cell {
+            background: #222;
+            border: 1px solid #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            box-shadow:
+                0 0 4px rgba(255, 255, 255, 0.2),
+                0 0 6px rgba(255, 255, 255, 0.15) inset;
+            text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .empty {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            text-shadow: none;
+        }
+
+        .extra {
+            opacity: 0.6;
+
+        }
+
+        /*--*/
+
+        #slide-panel {
+            background: #222;
+            border: 1px solid #555;
+            z-index: 999;
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 200px;
+            color: white;
+            transition: right 0.3s ease;
+            border-radius: 8px 0 0 8px;
+
+            box-shadow:
+                0 0 4px rgba(255, 255, 255, 0.2),
+                0 0 6px rgba(255, 255, 255, 0.15) inset;
+            text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+        }
+
+        #slide-panel.collapsed {
+            right: -200px;
+        }
+
+        #toggle-tab {
+
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 50px;
+            background: #222;
+            border: 1px solid #555;
+            color: white;
+
+
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px 0 0 8px;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 10px;
+
+        }
+
+        a {
+            text-decoration: underline;
+            color: #ccc;
+        }
     </style>
 </head>
 
 <body>
+
+    <div id="slide-panel">
+        <div id="toggle-tab">&gt;</div>
+        <div class="content">
+            <h3 style="margin: 0;">Late-night July</h3>
+
+            <p>Click to start, press [ESC] to show cursor.</p>
+
+            <div class="wasd-grid">
+                <div class="cell extra">Q↓</div>
+                <div class="cell">W</div>
+                <div class="cell extra">E↑</div>
+                <div class="cell">A</div>
+                <div class="cell">S</div>
+                <div class="cell">D</div>
+            </div>
+
+            <h3>Made for <a href="https://hackaccino.hackclub.com/">hackaccino</a></h3>
+            <p>using A-FRAME, Blender, and Three.js</p>
+            <a href="https://github.com/makrcat/a-frame">The code :)</a>
+        </div>
+    </div>
+
     <a-scene light="defaultLightsEnabled: false" shadow="enabled: true; type: pcfs" spawn-houses>
 
         <!-- plane -->
@@ -37,9 +157,8 @@
         <!--cam-->
         <!--1.3684590296822483-->
 
-        <a-camera position=" -4.22631077911584 7.416666666666692 0.436799087409643"   extended-wasd-controls  keyboard-movement look-controls="pointerLockEnabled: true">
-
-     
+        <a-camera position=" -5.22631077911584 7.416666666666692 0.436799087409643" extended-wasd-controls
+            keyboard-movement look-controls="pointerLockEnabled: true">
 
 
         </a-camera>
@@ -131,6 +250,15 @@
                     });
                 });
             }
+        });
+
+
+        const panel = document.getElementById('slide-panel');
+        const tab = document.getElementById('toggle-tab');
+
+        tab.addEventListener('click', () => {
+            panel.classList.toggle('collapsed');
+            tab.innerHTML = panel.classList.contains('collapsed') ? '&lt;' : '&gt;';
         });
     </script>
 
