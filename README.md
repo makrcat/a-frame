@@ -7,9 +7,9 @@ This is my submission for the [Frappucino hackathon](https://hackaccino.hackclub
 
 ## Notes
 
-Models not listed at the bottom are OC, namely the playground lol
+Models not listed at the bottom are OC, namely the playground lol.
 
-I had to bake lighting onto the playground because I can't really set up a good shader inside of A-FRAME unfortunately. If you have blender installed, you're welcome to go look around original file with cycles rendering engine :)
+I had to bake lighting onto the playground because I can't really set up a good shader inside of A-FRAME unfortunately. If you have blender installed, you're welcome to go look around original file with cycles rendering engine. It's the full_scene.glb
 
 <img src="noisyrender.png" width="600px">
 
