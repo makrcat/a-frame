@@ -7,18 +7,17 @@ This is my submission for the [Frappucino hackathon](https://hackaccino.hackclub
 
 ## Notes
 
-Models not listed at the bottom are OC, namely the playground :)
+Models not listed at the bottom are OC, namely the playground lol
 
 I had to bake lighting onto the playground because I can't really set up a good shader inside of A-FRAME unfortunately. If you have blender installed, you're welcome to go look around original file with cycles rendering engine :)
 
-To change the **SUN** position, go to `Layout` mode, then you should see a view in the bottom right with a lot of tabs. Click the red earth button (`World settings`) and now you can change the `Sun elevation` in degrees!!!
+<img src="noisyrender.png" width="600px">
 
-Raytracing is so impressive
+To change the **SUN** position, go to `Layout` mode, then you should see a view in the bottom right with a lot of tabs. Click the red earth button (`World settings`) and now you can change the `Sun elevation` in degrees !
 
 ## License ?
-just ask me to use my model lol
-
-It took a long time to make as a beginner. I won't like sue you if you do steal it without asking, but I will be very sad and lose faith in humanity
+just ask me to use the model cuz it took a while to make
+I won't like sue you if you do steal it without asking, but I will be very sad and lose faith in humanity
 
 ## Credits for other models 📦
 usage under CC license:
