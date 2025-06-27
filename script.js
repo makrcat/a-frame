@@ -212,7 +212,7 @@ function getRandomDirection() {
 /*
 constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], 
 
-tail = 15, launchVI = 35, burstVI = 20, particles = 100, BRI = 1, defaultDirection = { theta: Math.PI, phi: 0 }) {
+constructor(position, LL = 2.5, PTL = 3, color = [1, 0.1, 0], tail = 15, launchVI = 35, burstVI = 20, particles = 100, BRI = 1, defaultDirection = { theta: Math.PI, phi: 0 })
 */
 
 class Peony extends Firework {
@@ -311,7 +311,7 @@ class ParticleObj {
 
             if (!sprite) {
                 const material = new THREE.SpriteMaterial({
-                    map: new THREE.TextureLoader().load('soft-circle.png'),
+                    map: new THREE.TextureLoader().load('assets/soft-circle.png'),
                     color: this.color,
                     transparent: true,
 
