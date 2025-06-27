@@ -364,7 +364,7 @@ class ParticleObj {
                 this.trailSprites[len - 1 - i].material.opacity =
                     Math.max(0, (baseOpacity - 0.3) * n);
 
-                const baseScale = 0.6;
+                const baseScale = 0.8;
                 this.trailSprites[len - 1 - i].scale.set(baseScale * n, baseScale * n, 1);
             }
         }
